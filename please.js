@@ -103,14 +103,14 @@ please.$ = $.extend(please.$, (function () {
 	};
 
 	for (var k = 0, kl = jquery_fns.length; k < kl; k++) {
-        var funcName = jquery_fns[k];
-        if (funcName === 'constructor' || funcName === 'init' || funcName === 'promise') continue;
+		var funcName = jquery_fns[k];
+		if (funcName === 'constructor' || funcName === 'init' || funcName === 'promise') continue;
 
-        if (typeof $.fn[funcName] === 'function') {
-        	req[funcName] = $_fn(funcName);
-        } else if (funcName === 'length') {
-        	//req.__defineGetter__(funcName, $_fn(funcName));
-        }
+		if (typeof $.fn[funcName] === 'function') {
+			req[funcName] = $_fn(funcName);
+		} else if (funcName === 'length') {
+			//req.__defineGetter__(funcName, $_fn(funcName));
+		}
 	}
 
 	var custom_fns = [
@@ -118,8 +118,8 @@ please.$ = $.extend(please.$, (function () {
 	];
 
 	for (k = 0, kl = custom_fns.length; k < kl; k++) {
-        var funcName = custom_fns[k];
-        req[funcName] = $_fn(funcName);
+		var funcName = custom_fns[k];
+		req[funcName] = $_fn(funcName);
 	}
 
 	return req;
@@ -169,29 +169,29 @@ var please_$ = function () {
 };
 
 var please_$_fn = function (parentReq, funcName) {
-    var $jq = responses[parentReq.id];
-    if (!($jq instanceof $)) return null;
+	var $jq = responses[parentReq.id];
+	if (!($jq instanceof $)) return null;
 
-    var args = [].slice.call(arguments, 2);
-    for (var i = 0; i < args.length; i++) {
-        args[i] = (function (arg) {
-    		if (typeof arg === 'string') try {
-                var fn;
-                eval ('fn = ' + arg);
-                if (typeof fn === 'function') {
-                    return fn;
-                }
-                return arg;
-            } catch (e) {
-                return arg;
-            }
+	var args = [].slice.call(arguments, 2);
+	for (var i = 0; i < args.length; i++) {
+		args[i] = (function (arg) {
+			if (typeof arg === 'string') try {
+				var fn;
+				eval ('fn = ' + arg);
+				if (typeof fn === 'function') {
+					return fn;
+				}
+				return arg;
+			} catch (e) {
+				return arg;
+			}
 
-    		if (typeof arg === 'object') {
-    			mapObjectStringsToFunctions(arg);
-    		}
-    		return arg;
-        })(args[i]);
-    }
+			if (typeof arg === 'object') {
+				mapObjectStringsToFunctions(arg);
+			}
+			return arg;
+		})(args[i]);
+	}
 
 	var retval;
 	if (funcName === 'length') {
@@ -203,8 +203,8 @@ var please_$_fn = function (parentReq, funcName) {
 	try {
 		// check if object is serializable
 		var retval_array = retval instanceof $ ? retval.toArray() : retval;
-        // firefox happens to serialize Nodes somehow, check and throw if so
-        if (retval_array && retval_array.length && retval_array[0] instanceof Node) throw '';
+		// firefox happens to serialize Nodes somehow, check and throw if so
+		if (retval_array && retval_array.length && retval_array[0] instanceof Node) throw '';
 		vwoe_$.toJSON(retval_array);
 		return retval_array;
 	} catch (e) {
