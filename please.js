@@ -4,11 +4,7 @@ var defaults = {
 	targetOrigin: '*'
 };
 
-var requests = {}, responses = {};
-window.requests = requests;
-window.responses = responses;
-
-window.please = function (targetWindow, targetOrigin) {
+var please = function (targetWindow, targetOrigin) {
 	return $.extend(please.bind(), {
 		targetWindow: targetWindow,
 		targetOrigin: targetOrigin,
@@ -20,13 +16,19 @@ window.please = function (targetWindow, targetOrigin) {
 	});
 };
 
+var requests = {}, responses = {};
+window.please = please;
+please.requests = requests;
+please.responses = responses;
+
 please.defaults = function (values) {
 	$.extend(true, defaults, values);
 };
 
 please.init = function (thisWindow) {
-	thisWindow.addEventListener('message', please_messageHandler)
+	thisWindow.addEventListener('message', please_messageHandler);
 };
+
 
 var please_request = function (requestName) {
 	return function () {
@@ -45,6 +47,7 @@ var please_messageHandler = function (messageEvent) {
 	try {
 		var data = JSON.parse(messageEvent.data);
 	} catch (e) {
+		console.log('error parsing json data');
 		return;
 	}
 
@@ -56,6 +59,10 @@ var please_messageHandler = function (messageEvent) {
 		response.send();
 	} 
 	else if (data.type === 'response') {
+		console.log('response received:', data);
+		if (data.data && data.data.type === 'unserializable') {
+			data.data = UnserializableResponseData.create(data.data);
+		}
 		requests[data.id].resolve(data.data);
 		delete requests[data.id];
 	}
@@ -66,8 +73,8 @@ please.set = please_request('set');
 please.get = please_request('get');
 please.eval = please_request('eval');
 please.$ = please_request('$');
-please.$ = $.extend(please.$, (function () {
-	var req = {};
+please.$ = function () {
+	var req = please_request('$').apply(this, [].slice.call(arguments));
 	var jquery_fns = Object.keys($.fn);
 	var mapObjectFunctionsToStrings = function (obj) {
 		for (var i in obj) {
@@ -95,10 +102,12 @@ please.$ = $.extend(please.$, (function () {
 			var args = [].slice.call(arguments);
 			args = mapArrayFunctionsToStrings(args);
 
-			var newReq = new Request('$_fn');
-			newReq.data = [this, funcName].concat(args);
-			newReq.send();
-			return newReq;
+			var req = new Request('$_fn');
+			req.targetWindow = this.targetWindow || defaults.targetWindow;
+			req.targetOrigin = this.targetOrigin || defaults.targetOrigin;
+			req.data = [this, funcName].concat(args);
+			req.send();
+			return req;
 		};
 	};
 
@@ -123,7 +132,7 @@ please.$ = $.extend(please.$, (function () {
 	}
 
 	return req;
-})());
+};
 
 var please_call = function (funcName) {
 	var arr = funcName.split('.'),
@@ -197,19 +206,9 @@ var please_$_fn = function (parentReq, funcName) {
 	if (funcName === 'length') {
 		retval = $jq.length;
 	} else {
-		retval = $jq[funcName].apply(store[promiseId], args);
+		retval = $jq[funcName].apply($jq, args);
 	}
-
-	try {
-		// check if object is serializable
-		var retval_array = retval instanceof $ ? retval.toArray() : retval;
-		// firefox happens to serialize Nodes somehow, check and throw if so
-		if (retval_array && retval_array.length && retval_array[0] instanceof Node) throw '';
-		vwoe_$.toJSON(retval_array);
-		return retval_array;
-	} catch (e) {
-		return parentReq.id;
-	}
+	return retval;
 };
 
 function Request(name) {
@@ -238,9 +237,18 @@ Request.prototype = {
 		this.targetWindow = this.targetWindow || defaults.targetWindow;
 		this.targetOrigin = this.targetOrigin || defaults.targetOrigin;
 
-		console.log(window.location.href, 'sent message:', JSON.stringify(this));
-
-		this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
+		try {
+			// check if object is serializable
+			var jq = this.data;
+			var jq_array = jq instanceof $ ? jq.toArray() : jq;
+	        // firefox happens to serialize Nodes somehow, check and throw if so
+	        if (jq_array && jq_array.length && jq_array[0] instanceof Node) throw '';
+			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
+			console.log(window.location.href, 'sent message:', JSON.stringify(this));
+		} catch (e) {
+			console.log(window.location.href, 'sent message: Unserializable#', this.id);
+			this.targetWindow.postMessage(new UnserializableResponseData(this.id), this.targetOrigin);
+		}
 	},
 	perform: function () {
 		var please_fn;
@@ -268,7 +276,19 @@ Response.prototype = {
 		this.data = Request.create(req).perform();
 	},
 	send: function () {
-		this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
+		try {
+			// check if object is serializable
+			var jq = this.data;
+			var jq_array = jq instanceof $ ? jq.toArray() : jq;
+	        // firefox happens to serialize Nodes somehow, check and throw if so
+	        if (jq_array && jq_array.length && jq_array[0] instanceof Node) throw '';
+	        JSON.stringify(this)
+			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
+		} catch (e) {
+			this.data = new UnserializableResponseData(this.id);
+			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
+		}
+		console.log(window.location.href, 'sent message:', JSON.stringify(this));
 	},
 	toJSON: function () {
 		return {
@@ -279,5 +299,19 @@ Response.prototype = {
 		}
 	}
 };
+
+function UnserializableResponseData (requestId) {
+	this.id = requestId;
+	this.type = 'unserializable';
+}
+
+UnserializableResponseData.create = function (obj) {
+	var data = $.extend(new UnserializableResponseData(), obj);
+	return data;
+};
+
+please.Request = Request;
+please.Response = Response;
+please.UnserializableResponseData = UnserializableResponseData;
 
 })(jQuery);
