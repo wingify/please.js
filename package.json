@@ -1,0 +1,26 @@
+{
+  "name": "please",
+  "title": "please.js",
+  "description": "A cross domain communication library",
+  "version": "0.1.0",
+  "homepage": "",
+  "author": "Wingify",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Wingify/pleasejs"
+  },
+  "bugs": {
+    "url": "https://github.com/Wingify/pleasejs/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "keywords": [],
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-uglify": "~0.2.2"
+  }
+}
