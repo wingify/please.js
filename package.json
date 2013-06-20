@@ -1,7 +1,7 @@
 {
   "name": "please",
   "title": "please.js",
-  "description": "A cross domain communication library",
+  "description": "A simple PostMessage communication library",
   "version": "0.1.0",
   "homepage": "",
   "author": "Wingify",
