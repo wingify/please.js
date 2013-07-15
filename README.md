@@ -21,8 +21,8 @@ please(frame).get('document.height').then(function (height) {
 
 ## Downloads
 
-  * [Development version](https://github.com/wingify/please.js/blob/master/please.js) *Uncompressed with Comments 12kb*
-  * Production version *(Coming Soon)*
+  * [Development version](https://github.com/wingify/please.js/blob/master/please.js) *Uncompressed with Comments 15kb*
+  * [Production version](https://github.com/wingify/please.js/blob/master/please.min.js) *Minified 5kb*
 
 ## Documentation
 
@@ -214,9 +214,11 @@ please(otherWindow).get('undef.blahBlah', function (propertyValue) { // success 
 });
 ```
 
-## Changelog
+## Roadmap
 
-Coming soon...
+* Add support for communication in Chrome Extensions.
+* Add support for making please function accept jQuery selectors.
+* Document please.$ and improve its functionality.
 
 ## License
 
