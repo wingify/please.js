@@ -467,9 +467,9 @@ Response.prototype = {
 		} catch (e) {
 			this.data = new UnserializableResponseData(this.id);
 			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
-
+		} finally {
 			if (!this.success) {
-				throw this.data;
+				throw this.data.error;
 			}
 		}
 	},
@@ -515,6 +515,7 @@ UnserializableResponseData.create = function (obj) {
 };
 
 please.Error = function (error) {
+	this.error = error;
 	$.extend(this, error);
 	this.name = error.name;
 	this.message = error.message;
