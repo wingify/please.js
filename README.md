@@ -35,7 +35,7 @@ $(document).ready(function () {
 
 ## Downloads
 
-  * [Development version](https://github.com/wingify/please.js/blob/master/please.js) *Uncompressed with Comments 15kb*
+  * [Development version](https://github.com/wingify/please.js/blob/master/src/please.js) *Uncompressed with Comments 15kb*
   * [Production version](https://github.com/wingify/please.js/blob/master/please.min.js) *Minified 5kb*
 
 ## Documentation
