@@ -1,6 +1,6 @@
 please.init(window);
 
-asyncTest('Basic communication with child frame', function () {
+asyncTest('Basic communication with the child frame', function () {
 	var childFrame = $('#child-frame').get(0);
 
 	please(childFrame.contentWindow).call('sayHello').then(function (messageFromChild) {
@@ -71,6 +71,7 @@ asyncTest('Getting an undefined object\'s property from child', function () {
 		ok(error instanceof please.Error, "Error occured while accessing an undefined object's property");
 		equal(error.name, 'TypeError', 'Error is a TypeError');
 		equal(error.message, "Cannot read property 'property' of undefined", "Message is: Cannot read property 'property' of undefined");
+		ok(1, error.stack);
 		start();
 	});
 });
@@ -108,7 +109,8 @@ asyncTest('Setting a property on an undefined object', function () {
 	}, function (error) {
 		ok(error instanceof please.Error, "Error occured while accessing an undefined object's property");
 		equal(error.name, 'TypeError', 'Error is a TypeError');
-		equal(error.message, "Cannot set property 'property' of undefined", "Message is: Cannot read property 'property' of undefined");
+		equal(error.message, "Cannot set property 'property' of undefined", "Message is: Cannot set property 'property' of undefined");
+		ok(1, error.stack);
 		start();
 	});
 });
@@ -127,8 +129,7 @@ asyncTest('Calling a function with a parameter', function () {
 	var childFrame = $('#child-frame').get(0);
 
 	please(childFrame.contentWindow).call('giveMeApples', 5).then(function (apples) {
-		console.log('reached here');
-		deepEquals(apples, {apples: 5}, 'Called function giveMeApples with param N in child returned value {apple: N}');
+		deepEqual(apples, {apples: 5}, 'Called function giveMeApples with param N in child returned value {apple: N}');
 		start();
 	});
 });
@@ -137,12 +138,52 @@ asyncTest('Calling a method on an object', function () {
 	var childFrame = $('#child-frame').get(0);
 
 	please(childFrame.contentWindow).call('testObject.method').then(function (value) {
-		deepEqual(value, 'test', 'Calling testObject.method returned "test"');
+		equal(value, 'test', 'Calling testObject.method returned "test"');
 		start();
 	});
-})
+});
 
-asyncTest()
+asyncTest('Calling an undefined function', function () {
+	var childFrame = $('#child-frame').get(0);
+
+	please(childFrame.contentWindow).call('undefinedFunction').then(function () {
+		ok(0, "No error occured.");
+	}, function (error) {
+		ok(error instanceof please.Error, "Error occured while calling an undefined function.");
+		equal(error.name, 'TypeError', 'Error is a TypeError');
+		equal(error.message, "Cannot call method 'apply' of undefined", "Message is: Cannot call method 'apply' of undefined");
+		ok(1, error.stack);
+		start();
+	});
+});
+
+asyncTest('Calling an undefined method on an object', function () {
+	var childFrame = $('#child-frame').get(0);
+
+	please(childFrame.contentWindow).call('testObject.undefinedMethod').then(function () {
+		ok(0, "No error occured.");
+	}, function (error) {
+		ok(error instanceof please.Error, "Error occured while calling an undefined function.");
+		equal(error.name, 'TypeError', 'Error is a TypeError');
+		equal(error.message, "Cannot call method 'apply' of undefined", "Message is: Cannot call method 'apply' of undefined");
+		ok(1, error.stack);
+		start();
+	});
+});
+
+asyncTest('Calling an erroneous function', function () {
+	var childFrame = $('#child-frame').get(0);
+
+	please(childFrame.contentWindow).call('errorFunction').then(function () {
+		ok(0, "No error occured.");
+	}, function (error) {
+		ok(error instanceof please.Error, "Error occured while accessing an undefined object's property");
+		equal(error.message, "something went wrong", "Message is: something went wrong");
+		ok(1, error.stack);
+
+		start();
+	});
+});
 
 $(document).ready(function () {
 	$('#child-frame').load(function () {
