@@ -407,7 +407,7 @@ Request.prototype = {
 	 * @return {*} Returns whatever is returned by the corresponding request function.
 	 */
 	perform: function () {
-		eval('please_' + this.name).apply(this, this.data);
+		return eval('please_' + this.name).apply(this, this.data);
 	},
 
 	/**
