@@ -4,19 +4,33 @@ please.js is a Request/Response based wrapper around the PostMessage API that ma
 
 Here's a quick example to load an iframe window's location.
 ```javascript
-var frame = $('iframe').get(0).contentWindow;
+var frameWindow = $('iframe').get(0).contentWindow;
 
-please(frame).call('window.location.reload');
+please(frameWindow).call('window.location.reload');
 ```
 
 
 Here's another one that fetches you the child document's height:
 ```javascript
-var frame = $('iframe').get(0).contentWindow;
+var frameWindow = $('iframe').get(0).contentWindow;
 
-please(frame).get('document.height').then(function (height) {
+please(frameWindow).get('document.height').then(function (height) {
    console.log('child document\'s height:', height);
 });
+```
+
+Note: If you are using the above code on parent's document.onready function, it needs to be wrapped in frame.onload event.
+
+```javascript
+$(document).ready(function () {
+   var $frame = $('iframe');
+   $frame.load(function () {
+      var frameWindow = $frame.get(0).contentWindow;
+      please(frameWindow).get('document.height').then(function (height) {
+         console.log('child document\'s height:', height);
+      });
+   });
+})
 ```
 
 ## Downloads
@@ -217,7 +231,7 @@ please(otherWindow).get('undef.blahBlah', function (propertyValue) { // success 
 ## Roadmap
 
 * Add support for communication in Chrome Extensions.
-* Add support for making please function accept jQuery selectors.
+* Add support for making please function accept a jQuery selector.
 * Document please.$ and improve its functionality.
 
 ## License
