@@ -75,7 +75,11 @@ var please_messageHandler = function (messageEvent) {
 		var response = new Response(data);
 		responses[response.id] = response.data;
 		response.targetWindow = messageEvent.source;
-		response.targetOrigin = messageEvent.origin;
+
+		// messageEvent.origin is 'null' in case of file:// url.
+		// For such environment we use the default targetOrigin
+		response.targetOrigin = messageEvent.origin === 'null' ? defaults.targetOrigin : messageEvent.origin;
+		
 		response.send();
 	} 
 	else if (data.type === 'response') {
@@ -457,6 +461,9 @@ Response.prototype = {
 	 */
 	send: function () {
 		try {
+			this.targetWindow = this.targetWindow || defaults.targetWindow;
+			this.targetOrigin = this.targetOrigin || defaults.targetOrigin;
+
 			// check if object is serializable
 			var jq = this.data;
 			var jq_array = jq instanceof $ ? jq.toArray() : jq;
