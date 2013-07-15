@@ -2,8 +2,13 @@ please.init(window);
 
 asyncTest('Basic communication with the child frame', function () {
 	var childFrame = $('#child-frame').get(0);
+	var timeout = setTimeout(function () {
+		ok(0, "Timeout occured.");
+		start();
+	}, 2000);
 
 	please(childFrame.contentWindow).call('sayHello').then(function (messageFromChild) {
+		clearTimeout(timeout);
 		equal('Hello from child!', messageFromChild, 'Hello world handshake test passed');
 		start();
 	});
@@ -12,17 +17,12 @@ asyncTest('Basic communication with the child frame', function () {
 module('please.defaults')
 asyncTest('Overring defaults', function () {
 	var childFrame = $('#child-frame').get(0);
-	var timeout = setTimeout(function () {
-		ok(0, "Timeout occured.");
-		start();
-	}, 2000);
 	
 	please.defaults({
 		targetWindow: childFrame.contentWindow
 	});
 	ok(1, "Sent a request");
 	please.call('sayHello').then(function (messageFromChild) {
-		clearTimeout(timeout);
 		ok(1, "Received a response");
 		equal('Hello from child!', messageFromChild, 'please.defaults.contentWindow configuration works');
 		start();
