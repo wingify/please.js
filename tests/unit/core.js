@@ -39,6 +39,45 @@ asyncTest('Overring defaults', function () {
 	});
 });
 
+module('please.defaults.allowed');
+asyncTest('Does not respond to invalid origin', function () {
+	var childFrame = $('#child-frame').get(0);
+
+	runTestOnIframeLoad(function () {
+
+		please(childFrame.contentWindow).call('setupAllowedTest').then(function () {
+
+			var responded = false;
+
+			please(childFrame.contentWindow).get('testVariable').then(function (value) {
+				var responded = true;
+			});
+
+			setTimeout(function () {
+
+				please(childFrame.contentWindow).get('teardownAllowedTest').then(function (value) {
+
+					ok(!responded, "did not respond to request from invalid origin");
+
+					please(childFrame.contentWindow).get('testVariable').then(function (value) {
+						responded = true;
+					});
+
+					setTimeout(function () {
+						ok(responded, "responded to request from valid origin");
+						start();
+					}, 50);
+
+				});
+
+			}, 50);
+
+		});
+
+	});
+
+});
+
 
 module('please.get');
 
