@@ -1,7 +1,8 @@
 (function ($) {
 var defaults = {
 	targetWindow: window,
-	targetOrigin: '*'
+	targetOrigin: '*',
+	sourceOrigin: false
 };
 
 /**
@@ -62,7 +63,12 @@ var please_request = function (requestName) {
 };
 
 var please_messageHandler = function (messageEvent) {
-	// todo: check for origin
+	
+	if ($.isFunction(defaults.sourceOrigin)) {
+		if (!defaults.sourceOrigin(messageEvent)) {
+			return;
+		}
+	}
 
 	try {
 		var data = JSON.parse(messageEvent.data);

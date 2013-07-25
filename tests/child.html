@@ -26,7 +26,22 @@
     function errorFunction () {
       throw new Error('something went wrong');
     }
-
+    function teardownSourceOriginTest () {
+      please.defaults({
+        sourceOrigin: false
+      });
+    }
+    function setupSourceOriginTest () {
+      please.defaults({
+        sourceOrigin: function (messageEvent) {
+          if (JSON.parse(messageEvent.data).data[0] === "teardownSourceOriginTest") {
+            teardownSourceOriginTest();
+            return true;
+          }
+          return false;
+        }
+      });
+    }
   </script>
 </head>
 <body>
