@@ -69,7 +69,7 @@ please.defaults({
     targetOrigin: otherWindowOrigin,
 
     // conditionally restrict communication
-    allowed: function (messageEvent) {
+    sourceOrigin: function (messageEvent) {
       return (/^https?://example.com/.test(messageEvent.origin));
     }
 });
@@ -98,7 +98,7 @@ please(parent, '*.example.com').set('window.location.href', 'http://www.google.c
 
 **defaults** `please.defaults( objectHash )`
 
-Sets the default `targetWindow` to send message to, the `targetOrigin` of that window, and a test for conditions under which communication should be allowed.
+Sets the default `targetWindow` to send message to, the `targetOrigin` of that window, and a test for conditions under which communication should be sourceOrigin.
 
 ```javascript
 please.defaults({
@@ -109,7 +109,7 @@ please.defaults({
     targetOrigin: '*.example.com',
 
     // conditionally restrict communication
-    allowed: function (messageEvent) {
+    sourceOrigin: function (messageEvent) {
       return (/^https?://example.com/.test(messageEvent.origin));
     }
 });

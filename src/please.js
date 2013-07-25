@@ -2,7 +2,7 @@
 var defaults = {
 	targetWindow: window,
 	targetOrigin: '*',
-	allowed: false
+	sourceOrigin: false
 };
 
 /**
@@ -64,8 +64,8 @@ var please_request = function (requestName) {
 
 var please_messageHandler = function (messageEvent) {
 	
-	if ($.isFunction(defaults.allowed)) {
-		if (!defaults.allowed(messageEvent)) {
+	if ($.isFunction(defaults.sourceOrigin)) {
+		if (!defaults.sourceOrigin(messageEvent)) {
 			return;
 		}
 	}

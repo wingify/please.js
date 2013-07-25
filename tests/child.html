@@ -26,16 +26,16 @@
     function errorFunction () {
       throw new Error('something went wrong');
     }
-    function teardownAllowedTest () {
+    function teardownSourceOriginTest () {
       please.defaults({
-        allowed: false
+        sourceOrigin: false
       });
     }
-    function setupAllowedTest () {
+    function setupSourceOriginTest () {
       please.defaults({
-        allowed: function (messageEvent) {
-          if (JSON.parse(messageEvent.data).data[0] === "teardownAllowedTest") {
-            teardownAllowedTest();
+        sourceOrigin: function (messageEvent) {
+          if (JSON.parse(messageEvent.data).data[0] === "teardownSourceOriginTest") {
+            teardownSourceOriginTest();
             return true;
           }
           return false;

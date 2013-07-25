@@ -39,13 +39,13 @@ asyncTest('Overring defaults', function () {
 	});
 });
 
-module('please.defaults.allowed');
+module('please.defaults.sourceOrigin');
 asyncTest('Does not respond to invalid origin', function () {
 	var childFrame = $('#child-frame').get(0);
 
 	runTestOnIframeLoad(function () {
 
-		please(childFrame.contentWindow).call('setupAllowedTest').then(function () {
+		please(childFrame.contentWindow).call('setupSourceOriginTest').then(function () {
 
 			var responded = false;
 
@@ -55,7 +55,7 @@ asyncTest('Does not respond to invalid origin', function () {
 
 			setTimeout(function () {
 
-				please(childFrame.contentWindow).get('teardownAllowedTest').then(function (value) {
+				please(childFrame.contentWindow).get('teardownSourceOriginTest').then(function (value) {
 
 					ok(!responded, "did not respond to request from invalid origin");
 
