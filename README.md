@@ -66,7 +66,12 @@ please.defaults({
     targetWindow: otherWindow,
     
     // what the target window's origin must be for the communication to facilitate
-    targetOrigin: otherWindowOrigin 
+    targetOrigin: otherWindowOrigin,
+
+    // conditionally restrict communication
+    sourceOrigin: function (messageEvent) {
+      return (/^https?://example.com/.test(messageEvent.origin));
+    }
 });
 ```
 
@@ -93,14 +98,20 @@ please(parent, '*.example.com').set('window.location.href', 'http://www.google.c
 
 **defaults** `please.defaults( objectHash )`
 
-Sets the default `targetWindow` to send message to, and the `targetOrigin` of that window.
+Sets the default `targetWindow` to send message to, the `targetOrigin` of that window, and a test for conditions under which communication should be sourceOrigin.
+
 ```javascript
 please.defaults({
     // reference to the window to send messages to
     targetWindow: $('iframe').get(0).contentWindow,
     
     // what the target window's origin must be for the communication to facilitate
-    targetOrigin: '*.example.com'
+    targetOrigin: '*.example.com',
+
+    // conditionally restrict communication
+    sourceOrigin: function (messageEvent) {
+      return (/^https?://example.com/.test(messageEvent.origin));
+    }
 });
 ```
 
