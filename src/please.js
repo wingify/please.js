@@ -223,6 +223,7 @@ please.$ = function () {
 	return req;
 };
 
+var fn = {};
 /**
  * Internal function called in the target frame when the requesting frame
  * calls please.call.
@@ -232,7 +233,7 @@ please.$ = function () {
  * @return {*} Returns whatever is returned by the called function
  * @throws {Error} Throws an error if the called function throws an error.
  */
-var please_call = function (funcName) {
+fn.call = function (funcName) {
 	var arr = funcName.split('.'),
 		context,
 		func = context = window,
@@ -254,7 +255,7 @@ var please_call = function (funcName) {
  * @param  {String} key The key to set.
  * @param  {*} value The value to set the key to.
  */
-var please_set = function (key, value) {
+fn.set = function (key, value) {
 	var arr = key.split('.');
 	var retVal = window;
 	arr.forEach(function (item, i) {
@@ -274,7 +275,7 @@ var please_set = function (key, value) {
  * @param  {String} key The variable / property to get the value of.
  * @return {*} The value of the requested property / variable.
  */
-var please_get = function (key) {
+fn.get = function (key) {
 	var arr = key.split('.'),
 		retVal = window;
 	arr.forEach(function (item) {
@@ -290,7 +291,7 @@ var please_get = function (key) {
  * @private
  * @param  {String} statements The statements to eval in the target frame.
  */
-var please_eval = function (statements) {
+fn.eval = function (statements) {
 	return $.globalEval(statements);
 };
 
@@ -301,7 +302,7 @@ var please_eval = function (statements) {
  * @private
  * @return {jQuery} The jQuery object created using the selector passed.
  */
-var please_$ = function () {
+fn.$ = function () {
 	return $.apply($, [].slice.call(arguments));
 };
 
@@ -315,7 +316,7 @@ var please_$ = function () {
  * of the parent request.
  * @return {*} Returns whatever is returned by the called jQuery object method.
  */
-var please_$_fn = function (parentReq, funcName) {
+fn.$_fn = function (parentReq, funcName) {
 	var $jq = responses[parentReq.id];
 	if (!($jq instanceof $)) return null;
 
@@ -417,7 +418,7 @@ Request.prototype = {
 	 * @return {*} Returns whatever is returned by the corresponding request function.
 	 */
 	perform: function () {
-		return eval('please_' + this.name).apply(this, this.data);
+		return fn[this.name].apply(this, this.data);
 	},
 
 	/**
