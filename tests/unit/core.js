@@ -275,7 +275,7 @@ asyncTest('Calling an erroneous function', function () {
 			ok(0, "No error occured.");
 		}, function (error) {
 			ok(error instanceof please.Error, "Error occured while accessing an undefined object's property");
-			equal(error.message, "something went wrong", "Message is: something went wrong");
+			equal(error.message, "something went deliberately wrong", "Message is: something went deliberately wrong");
 			ok(1, error.stack);
 
 			start();
