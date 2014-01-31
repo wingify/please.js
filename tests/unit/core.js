@@ -217,6 +217,18 @@ asyncTest('Calling a function with a parameter', function () {
 	});
 });
 
+asyncTest('Calling a function with an undefined parameter', function () {
+	var childFrame = $('#child-frame').get(0);
+
+	runTestOnIframeLoad(function () {
+
+		please(childFrame.contentWindow).call('echoFunction', undefined).then(function (echo) {
+			deepEqual(echo, [null], 'Called function echoFunction with undefined param should return a null param');
+			start();
+		});
+	});
+});
+
 asyncTest('Calling a method on an object', function () {
 	var childFrame = $('#child-frame').get(0);
 

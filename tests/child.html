@@ -26,6 +26,11 @@
     function errorFunction () {
       throw new Error('something went deliberately wrong');
     }
+
+    function echoFunction() {
+      return Array.prototype.slice.call(arguments);
+    }
+
     function teardownSourceOriginTest () {
       please.defaults({
         sourceOrigin: false
