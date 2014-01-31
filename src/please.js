@@ -1,4 +1,7 @@
-(function ($) {
+(function ($, window) {
+    'use strict';
+    var console = window.console;
+
 var defaults = {
 	targetWindow: window,
 	targetOrigin: '*',
@@ -7,11 +10,12 @@ var defaults = {
 
 /**
  * The please global object. Can be used both as an object and a function.
- * 
+ *
  * @param  {String} [targetWindow] The reference to the window to pass messages to.
  * @param  {String} [targetOrigin] What the target origin of the other window must be.
  * @return {Object} A please object instance.
  */
+/* jshint evil: true */
 var please = function (targetWindow, targetOrigin) {
 	return $.extend(please.bind(), {
 		targetWindow: targetWindow,
@@ -31,7 +35,7 @@ please.responses = responses;
 
 /**
  * Sets the default targetWindow to send message to, and the targetOrigin of that window.
- * 
+ *
  * @param  {String} values Params to use as defaults.
  * @return {Object} A please object instance.
  */
@@ -42,7 +46,7 @@ please.defaults = function (values) {
 
 /**
  * Initialize please. In both the windows (frames), add the below code:
- * 
+ *
  * @param  {Window} thisWindow The reference to the current window.
  * @return {Object} A please object instance.
  */
@@ -63,15 +67,16 @@ var please_request = function (requestName) {
 };
 
 var please_messageHandler = function (messageEvent) {
-	
+
 	if ($.isFunction(defaults.sourceOrigin)) {
 		if (!defaults.sourceOrigin(messageEvent)) {
 			return;
 		}
 	}
 
+    var data;
 	try {
-		var data = JSON.parse(messageEvent.data);
+		data = JSON.parse(messageEvent.data);
 	} catch (e) {
 		console.log('error parsing json data');
 		return;
@@ -85,9 +90,9 @@ var please_messageHandler = function (messageEvent) {
 		// messageEvent.origin is 'null' in case of file:// url.
 		// For such environment we use the default targetOrigin
 		response.targetOrigin = messageEvent.origin === 'null' ? defaults.targetOrigin : messageEvent.origin;
-		
+
 		response.send();
-	} 
+	}
 	else if (data.type === 'response') {
 		if (data.data && data.data.type === 'unserializable') {
 			data.data = UnserializableResponseData.create(data.data);
@@ -97,7 +102,7 @@ var please_messageHandler = function (messageEvent) {
 		} else {
 			requests[data.id].reject(new please.Error(data.data));
 		}
-		
+
 		delete requests[data.id];
 	}
 };
@@ -108,9 +113,9 @@ var please_messageHandler = function (messageEvent) {
  * invoked in the other frame, the promise is resolved to the return value of the
  * function.
  *
- * You could also call a method on another object. Just pass the object name in 
+ * You could also call a method on another object. Just pass the object name in
  * the functionName as well like object.someMethod.
- * 
+ *
  * @param  {String} functionName The function name to call in the other window.
  * @param  {...} args... Any parameters to pass to the function.
  * @return {Promise} A jQuery promise object. Resolves to either the return value
@@ -119,8 +124,8 @@ var please_messageHandler = function (messageEvent) {
 please.call = please_request('call');
 
 /**
- * Sets a global variable or a property on an object in the other window. 
- * Returns a jQuery promise object. After the property is set, the promise 
+ * Sets a global variable or a property on an object in the other window.
+ * Returns a jQuery promise object. After the property is set, the promise
  * object is resolved.
  *
  * @param  {String} propertyName The property to set in the other window.
@@ -131,10 +136,10 @@ please.call = please_request('call');
 please.set = please_request('set');
 
 /**
- * Gets a value of a global variable or a property on an object in the 
- * other window. Returns a jQuery promise object that resolves with the 
+ * Gets a value of a global variable or a property on an object in the
+ * other window. Returns a jQuery promise object that resolves with the
  * value of the property requested.
- * 
+ *
  * @param  {String} propertyName The property to get from the other window.
  * @param  {String} propertyValue The value to set the property to.
  * @return {Promise} A jQuery promise object. Resolves to the value of the property
@@ -145,7 +150,7 @@ please.get = please_request('get');
 /**
  * Evals a string in the other window in global scope. Uses jQuery.globalEval
  * internally.
- * 
+ *
  * @param  {String} evalString The string to eval.
  * @return {Promise} A jQuery promise object. Resolves if the string evals
  * successfully. Fails to resolve if an error is thrown.
@@ -156,7 +161,7 @@ please.eval = please_request('eval');
  * Triggers jQuery on the other window. Returns a promise object with jQuery functions
  * overloaded on it that can be chained to perform complicated tasks in the other
  * window as if it was this window's own.
- * 
+ *
  * @param {String} selector The selector to select an element in the other window.
  * @return {jQueryPromise} A promise object overloaded with jQuery methods to support
  * chaining.
@@ -200,9 +205,12 @@ please.$ = function () {
 		};
 	};
 
+    var funcName;
 	for (var k = 0, kl = jquery_fns.length; k < kl; k++) {
-		var funcName = jquery_fns[k];
-		if (funcName === 'constructor' || funcName === 'init' || funcName === 'promise') continue;
+		funcName = jquery_fns[k];
+		if (funcName === 'constructor' || funcName === 'init' || funcName === 'promise') {
+            continue;
+        }
 
 		if (typeof $.fn[funcName] === 'function') {
 			req[funcName] = $_fn(funcName);
@@ -216,7 +224,7 @@ please.$ = function () {
 	];
 
 	for (k = 0, kl = custom_fns.length; k < kl; k++) {
-		var funcName = custom_fns[k];
+		funcName = custom_fns[k];
 		req[funcName] = $_fn(funcName);
 	}
 
@@ -234,10 +242,10 @@ var fn = {};
  * @throws {Error} Throws an error if the called function throws an error.
  */
 fn.call = function (funcName) {
-	var arr = funcName.split('.'),
-		context,
-		func = context = window,
-		data = [].slice.call(arguments, 1);
+	var arr = funcName.split('.');
+	var context = window;
+    var func = context;
+	var data = [].slice.call(arguments, 1);
 	arr.forEach(function (item, i) {
 		if (i === arr.length - 1) {
 			context = func;
@@ -318,27 +326,32 @@ fn.$ = function () {
  */
 fn.$_fn = function (parentReq, funcName) {
 	var $jq = responses[parentReq.id];
-	if (!($jq instanceof $)) return null;
+	if (!($jq instanceof $)) {
+        return null;
+    }
 
 	var args = [].slice.call(arguments, 2);
-	for (var i = 0; i < args.length; i++) {
-		args[i] = (function (arg) {
-			if (typeof arg === 'string') try {
-				var fn;
-				eval ('fn = ' + arg);
-				if (typeof fn === 'function') {
-					return fn;
-				}
-				return arg;
-			} catch (e) {
-				return arg;
-			}
+    var mFn = function (arg) {
+        if (typeof arg === 'string') {
+            try {
+                var fn;
+                eval('fn = ' + arg);
+                if (typeof fn === 'function') {
+                    return fn;
+                }
+                return arg;
+            } catch (e) {
+                return arg;
+            }
+        }
 
-			if (typeof arg === 'object') {
-				mapObjectStringsToFunctions(arg);
-			}
-			return arg;
-		})(args[i]);
+        if (typeof arg === 'object') {
+            mapObjectStringsToFunctions(arg);
+        }
+        return arg;
+    };
+	for (var i = 0; i < args.length; i++) {
+		args[i] = mFn(args[i]);
 	}
 
 	var retval;
@@ -358,12 +371,13 @@ fn.$_fn = function (parentReq, funcName) {
  * @constructor
  */
 function Request(name) {
+    /* jshint unused: false */
 	this.init.apply(this, [].slice.call(arguments));
 }
 
 /**
  * Creates a Response object instance.
- * 
+ *
  * @param {Request} req The Request object this Response is associated with.
  * @class Response
  * @constructor
@@ -375,15 +389,17 @@ function Response(req) {
 Request.prototype = {
 	/**
 	 * Initializes a Request object instance.
-	 * 
+	 *
 	 * @param  {String} name The name of the request.
 	 */
 	init: function (name) {
 		$.extend(this, $.Deferred());
 
-		var id = + new Date;
-		while (id === + new Date);
-		id = + new Date;
+		var id = + new Date();
+		while (id === + new Date()) {
+            // deliberately empty
+        }
+		id = + new Date();
 
 		this.id = id;
 		this.name = name;
@@ -404,8 +420,10 @@ Request.prototype = {
 			// check if object is serializable
 			var jq = this.data;
 			var jq_array = jq instanceof $ ? jq.toArray() : jq;
-	        // firefox happens to serialize Nodes somehow, check and throw if so
-	        if (jq_array && jq_array.length && jq_array[0] instanceof Node) throw '';
+            // firefox happens to serialize Nodes somehow, check and throw if so
+            if (jq_array && jq_array.length && jq_array[0] instanceof Node) {
+                throw '';
+            }
 			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
 		} catch (e) {
 			this.targetWindow.postMessage(new UnserializableResponseData(this.id), this.targetOrigin);
@@ -414,7 +432,7 @@ Request.prototype = {
 	/**
 	 * Performs the request by calling the internal function associated with the
 	 * request name.
-	 * 
+	 *
 	 * @return {*} Returns whatever is returned by the corresponding request function.
 	 */
 	perform: function () {
@@ -436,7 +454,7 @@ Request.prototype = {
 
 /**
  * Creates a Request object instance by using a hash of default values.
- * 
+ *
  * @param  {Object} obj The hash of default values to override.
  * @return {Request} A Request object instance.
  */
@@ -447,7 +465,7 @@ Request.create = function (obj) {
 Response.prototype = {
 	/**
 	 * Initializes a Response object instance.
-	 * 
+	 *
 	 * @param  {Request} req The Request object this Response is associated with.
 	 */
 	init: function (req) {
@@ -474,10 +492,12 @@ Response.prototype = {
 			// check if object is serializable
 			var jq = this.data;
 			var jq_array = jq instanceof $ ? jq.toArray() : jq;
-	        // firefox happens to serialize Nodes somehow, check and throw if so
-	        if (jq_array && jq_array.length && jq_array[0] instanceof Node) throw '';
-	        JSON.stringify(this)
-			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
+            // firefox happens to serialize Nodes somehow, check and throw if so
+            if (jq_array && jq_array.length && jq_array[0] instanceof Node) {
+                throw '';
+            }
+            var serialized = JSON.stringify(this);
+			this.targetWindow.postMessage(serialized, this.targetOrigin);
 		} catch (e) {
 			this.data = new UnserializableResponseData(this.id);
 			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
@@ -497,7 +517,7 @@ Response.prototype = {
 			type: this.type,
 			data: this.data,
 			success: this.success
-		}
+		};
 	}
 };
 
@@ -519,13 +539,12 @@ function UnserializableResponseData (requestId) {
 
 /**
  * Creates a UnserializableResponseData object instance by using a hash of default values.
- * 
+ *
  * @param  {Object} obj The hash of default values to override.
  * @return {Request} A Unserializable object instance.
  */
 UnserializableResponseData.create = function (obj) {
-	var data = $.extend(new UnserializableResponseData(), obj);
-	return data;
+	return $.extend(new UnserializableResponseData(), obj);
 };
 
 please.Error = function (error) {
@@ -551,4 +570,4 @@ please.Request = Request;
 please.Response = Response;
 please.UnserializableResponseData = UnserializableResponseData;
 
-})(jQuery);
+})(jQuery, window);
