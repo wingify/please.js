@@ -252,8 +252,27 @@ _please.call = function (funcName) {
 		}
 		func = func[item];
 	});
-	return func.apply(context, data);
+	if (typeof func === 'function') {
+		return func.apply(context, data);
+	} else {
+		throw new please.Error({
+			name: 'TypeError',
+			message: "'" + funcName + "'" + ' is not a function'
+		});
+	}
 };
+
+function pathErrorHelper(arr, currentPos) {
+	var l = arr.length;
+	var pathToHere = arr.slice(0, currentPos + 1);
+	pathToHere.unshift('window');
+
+	return {
+		lastPathPart: arr[l - 1],
+		fullPath: arr.slice(0, l - 1).join('.'),
+		currentPath: pathToHere.join('.')
+	};
+}
 
 /**
  * Internal function called in the target frame when the requesting frame
@@ -266,11 +285,19 @@ _please.call = function (funcName) {
 _please.set = function (key, value) {
 	var arr = key.split('.');
 	var retVal = window;
+	var l = arr.length;
 	arr.forEach(function (item, i) {
-		if (i === arr.length - 1) {
+		if (i === l - 1) {
 			retVal[item] = value;
 		} else {
 			retVal = retVal[item];
+			if (typeof retVal === 'undefined' || retVal === null) {
+				var info = pathErrorHelper(arr, i);
+				throw new please.Error({
+					name: 'TypeError',
+					message: 'Can not set ' + "'" + info.lastPathPart + "' on '" + info.fullPath + "', because path element '" + info.currentPath + "' is null or undefined"
+				});
+			}
 		}
 	});
 };
@@ -286,7 +313,14 @@ _please.set = function (key, value) {
 _please.get = function (key) {
 	var arr = key.split('.'),
 		retVal = window;
-	arr.forEach(function (item) {
+	arr.forEach(function (item, i) {
+		if (typeof retVal === 'undefined' || retVal === null) {
+			var info = pathErrorHelper(arr, i - 1);
+			throw new please.Error({
+				name: 'TypeError',
+				message: 'Can not get ' + "'" + info.lastPathPart + "' of '" + info.fullPath + "', because path element '" + info.currentPath + "' is null or undefined"
+			});
+		}
 		retVal = retVal[item];
 	});
 	return retVal;

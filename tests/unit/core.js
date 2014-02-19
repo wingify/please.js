@@ -133,7 +133,25 @@ asyncTest('Getting an undefined object\'s property from child', function () {
 		}, function (error) {
 			ok(error instanceof please.Error, "Error occured while accessing an undefined object's property");
 			equal(error.name, 'TypeError', 'Error is a TypeError');
-			equal(error.message, "Cannot read property 'property' of undefined", "Message is: Cannot read property 'property' of undefined");
+			equal(error.message, "Can not get 'property' of 'undefinedObject', because path element 'window.undefinedObject' is null or undefined", "Message is: Can not get 'property' of 'undefinedObject', because path element 'window.undefinedObject' is null or undefined");
+			ok(1, error.stack);
+			start();
+		});
+
+	});
+});
+
+asyncTest('Getting an undefined object\'s property from child with nested undefined path', function () {
+	var childFrame = $('#child-frame').get(0);
+
+	runTestOnIframeLoad(function () {
+
+		please(childFrame.contentWindow).get('defined.undefinedObject.property').then(function () {
+			ok(0, "No error occured.");
+		}, function (error) {
+			ok(error instanceof please.Error, "Error occured while accessing an undefined object's property");
+			equal(error.name, 'TypeError', 'Error is a TypeError');
+			equal(error.message, "Can not get 'property' of 'defined.undefinedObject', because path element 'window.defined.undefinedObject' is null or undefined", "Message is: Can not get 'property' of 'defined.undefinedObject', because path element 'window.defined.undefinedObject' is null or undefined");
 			ok(1, error.stack);
 			start();
 		});
@@ -183,7 +201,25 @@ asyncTest('Setting a property on an undefined object', function () {
 		}, function (error) {
 			ok(error instanceof please.Error, "Error occured while accessing an undefined object's property");
 			equal(error.name, 'TypeError', 'Error is a TypeError');
-			equal(error.message, "Cannot set property 'property' of undefined", "Message is: Cannot set property 'property' of undefined");
+			equal(error.message, "Can not set 'property' on 'undefinedObject', because path element 'window.undefinedObject' is null or undefined", "Message is: Can not set 'property' on 'undefinedObject', because path element 'window.undefinedObject' is null or undefined");
+			ok(1, error.stack);
+			start();
+		});
+
+	});
+});
+
+asyncTest('Setting a property on an undefined object in a nested path', function () {
+	var childFrame = $('#child-frame').get(0);
+
+	runTestOnIframeLoad(function () {
+
+		please(childFrame.contentWindow).set('defined.undefinedObject.property', 'someValue').then(function () {
+			ok(0, "No error occured.");
+		}, function (error) {
+			ok(error instanceof please.Error, "Error occured while accessing an undefined object's property");
+			equal(error.name, 'TypeError', 'Error is a TypeError');
+			equal(error.message, "Can not set 'property' on 'defined.undefinedObject', because path element 'window.defined.undefinedObject' is null or undefined", "Message is: Can not set 'property' on 'defined.undefinedObject', because path element 'window.defined.undefinedObject' is null or undefined");
 			ok(1, error.stack);
 			start();
 		});
@@ -252,7 +288,7 @@ asyncTest('Calling an undefined function', function () {
 		}, function (error) {
 			ok(error instanceof please.Error, "Error occured while calling an undefined function.");
 			equal(error.name, 'TypeError', 'Error is a TypeError');
-			equal(error.message, "Cannot call method 'apply' of undefined", "Message is: Cannot call method 'apply' of undefined");
+			equal(error.message, "'undefinedFunction' is not a function", "Message is: 'undefinedFunction' is not a function");
 			ok(1, error.stack);
 			start();
 		});
@@ -270,7 +306,7 @@ asyncTest('Calling an undefined method on an object', function () {
 		}, function (error) {
 			ok(error instanceof please.Error, "Error occured while calling an undefined function.");
 			equal(error.name, 'TypeError', 'Error is a TypeError');
-			equal(error.message, "Cannot call method 'apply' of undefined", "Message is: Cannot call method 'apply' of undefined");
+			equal(error.message, "'testObject.undefinedMethod' is not a function", "Message is: 'testObject.undefinedMethod' is not a function");
 			ok(1, error.stack);
 			start();
 		});

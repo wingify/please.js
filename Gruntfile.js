@@ -19,11 +19,15 @@ module.exports = function(grunt) {
 				src: 'src/<%= pkg.name %>.js',
 				dest: '<%= pkg.name %>.min.js'
 			}
+		},
+		qunit: {
+			all: ['tests/index.html']
 		}
 
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-qunit');
 
-	grunt.registerTask('default', ['uglify']);
+	grunt.registerTask('default', ['qunit', 'uglify']);
 };
