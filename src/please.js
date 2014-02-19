@@ -231,7 +231,7 @@ please.$ = function () {
 	return req;
 };
 
-var fn = {};
+var _please = {};
 /**
  * Internal function called in the target frame when the requesting frame
  * calls please.call.
@@ -241,7 +241,7 @@ var fn = {};
  * @return {*} Returns whatever is returned by the called function
  * @throws {Error} Throws an error if the called function throws an error.
  */
-fn.call = function (funcName) {
+_please.call = function (funcName) {
 	var arr = funcName.split('.');
 	var context = window;
 	var func = context;
@@ -263,7 +263,7 @@ fn.call = function (funcName) {
  * @param  {String} key The key to set.
  * @param  {*} value The value to set the key to.
  */
-fn.set = function (key, value) {
+_please.set = function (key, value) {
 	var arr = key.split('.');
 	var retVal = window;
 	arr.forEach(function (item, i) {
@@ -283,7 +283,7 @@ fn.set = function (key, value) {
  * @param  {String} key The variable / property to get the value of.
  * @return {*} The value of the requested property / variable.
  */
-fn.get = function (key) {
+_please.get = function (key) {
 	var arr = key.split('.'),
 		retVal = window;
 	arr.forEach(function (item) {
@@ -299,7 +299,7 @@ fn.get = function (key) {
  * @private
  * @param  {String} statements The statements to eval in the target frame.
  */
-fn.eval = function (statements) {
+_please.eval = function (statements) {
 	return $.globalEval(statements);
 };
 
@@ -310,7 +310,7 @@ fn.eval = function (statements) {
  * @private
  * @return {jQuery} The jQuery object created using the selector passed.
  */
-fn.$ = function () {
+_please.$ = function () {
 	return $.apply($, [].slice.call(arguments));
 };
 
@@ -324,7 +324,7 @@ fn.$ = function () {
  * of the parent request.
  * @return {*} Returns whatever is returned by the called jQuery object method.
  */
-fn.$_fn = function (parentReq, funcName) {
+_please.$_fn = function (parentReq, funcName) {
 	var $jq = responses[parentReq.id];
 	if (!($jq instanceof $)) {
 		return null;
@@ -436,7 +436,7 @@ Request.prototype = {
 	 * @return {*} Returns whatever is returned by the corresponding request function.
 	 */
 	perform: function () {
-		return fn[this.name].apply(this, this.data);
+		return _please[this.name].apply(this, this.data);
 	},
 
 	/**
