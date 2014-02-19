@@ -20,6 +20,9 @@ module.exports = function(grunt) {
 				dest: '<%= pkg.name %>.min.js'
 			}
 		},
+		jshint: {
+			all: ['Gruntfile.js', 'src/**/*.js', 'tests/unit/**/*.js']
+		},
 		qunit: {
 			all: ['tests/index.html']
 		}
@@ -27,7 +30,8 @@ module.exports = function(grunt) {
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-qunit');
 
-	grunt.registerTask('default', ['qunit', 'uglify']);
+	grunt.registerTask('default', ['jshint', 'qunit', 'uglify']);
 };
