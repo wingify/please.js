@@ -19,11 +19,15 @@ module.exports = function(grunt) {
 				src: 'src/<%= pkg.name %>.js',
 				dest: '<%= pkg.name %>.min.js'
 			}
+		},
+		jshint: {
+			all: ['Gruntfile.js', 'src/**/*.js', 'tests/unit/**/*.js']
 		}
 
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 
-	grunt.registerTask('default', ['uglify']);
+	grunt.registerTask('default', ['jshint', 'uglify']);
 };

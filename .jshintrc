@@ -1,0 +1,14 @@
+{
+	"browser": true,
+	"debug": false,
+	"devel": false,
+	"strict": true,
+	"undef": true,
+	"unused": true,
+	"jquery": true,
+	"multistr": true,
+	"curly": true,
+	"eqeqeq": true,
+	"forin": true,
+	"freeze": true
+}

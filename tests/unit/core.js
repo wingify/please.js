@@ -17,7 +17,7 @@ asyncTest('Basic communication with the child frame', function () {
 	});
 });
 
-module('please.defaults')
+module('please.defaults');
 asyncTest('Overring defaults', function () {
 	var childFrame = $('#child-frame').get(0);
 	
@@ -155,7 +155,7 @@ asyncTest('Setting a global variable in child', function () {
 			start();
 		});
 	});
-})
+});
 
 asyncTest('Setting an object\'s property in child', function () {
 	var childFrame = $('#child-frame').get(0);
