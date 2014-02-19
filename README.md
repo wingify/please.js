@@ -44,6 +44,8 @@ $(document).ready(function () {
 
 please.js is based on top of jQuery and the jQuery Promise API. jQuery version 1.6 or above is preferred. To make the communication between two windows on different domains work, both of them must be injected with the same version of jQuery and please.js.
 
+	Hint: `undefined` values become `null` values in cross-frame communication. This is because JSON serialization does not support `undefined` (e.g. `JSON.stringify([undefined, 'x'])` becomes `[null, 'x']`).
+
 ### The please global object
 
 Getting started with please.js is easy:

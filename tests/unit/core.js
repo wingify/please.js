@@ -217,6 +217,18 @@ asyncTest('Calling a function with a parameter', function () {
 	});
 });
 
+asyncTest('Calling a function with an undefined parameter', function () {
+	var childFrame = $('#child-frame').get(0);
+
+	runTestOnIframeLoad(function () {
+
+		please(childFrame.contentWindow).call('echoFunction', undefined).then(function (echo) {
+			deepEqual(echo, [null], 'Called function echoFunction with undefined param should return a null param');
+			start();
+		});
+	});
+});
+
 asyncTest('Calling a method on an object', function () {
 	var childFrame = $('#child-frame').get(0);
 
@@ -275,7 +287,7 @@ asyncTest('Calling an erroneous function', function () {
 			ok(0, "No error occured.");
 		}, function (error) {
 			ok(error instanceof please.Error, "Error occured while accessing an undefined object's property");
-			equal(error.message, "something went wrong", "Message is: something went wrong");
+			equal(error.message, "something went deliberately wrong", "Message is: something went deliberately wrong");
 			ok(1, error.stack);
 
 			start();
