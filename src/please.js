@@ -1,6 +1,6 @@
 (function ($, window) {
-    'use strict';
-    var console = window.console;
+	'use strict';
+	var console = window.console;
 
 var defaults = {
 	targetWindow: window,
@@ -74,7 +74,7 @@ var please_messageHandler = function (messageEvent) {
 		}
 	}
 
-    var data;
+	var data;
 	try {
 		data = JSON.parse(messageEvent.data);
 	} catch (e) {
@@ -205,12 +205,12 @@ please.$ = function () {
 		};
 	};
 
-    var funcName;
+	var funcName;
 	for (var k = 0, kl = jquery_fns.length; k < kl; k++) {
 		funcName = jquery_fns[k];
 		if (funcName === 'constructor' || funcName === 'init' || funcName === 'promise') {
-            continue;
-        }
+			continue;
+		}
 
 		if (typeof $.fn[funcName] === 'function') {
 			req[funcName] = $_fn(funcName);
@@ -244,7 +244,7 @@ var fn = {};
 fn.call = function (funcName) {
 	var arr = funcName.split('.');
 	var context = window;
-    var func = context;
+	var func = context;
 	var data = [].slice.call(arguments, 1);
 	arr.forEach(function (item, i) {
 		if (i === arr.length - 1) {
@@ -327,29 +327,29 @@ fn.$ = function () {
 fn.$_fn = function (parentReq, funcName) {
 	var $jq = responses[parentReq.id];
 	if (!($jq instanceof $)) {
-        return null;
-    }
+		return null;
+	}
 
 	var args = [].slice.call(arguments, 2);
-    var mFn = function (arg) {
-        if (typeof arg === 'string') {
-            try {
-                var fn;
-                eval('fn = ' + arg);
-                if (typeof fn === 'function') {
-                    return fn;
-                }
-                return arg;
-            } catch (e) {
-                return arg;
-            }
-        }
+	var mFn = function (arg) {
+		if (typeof arg === 'string') {
+			try {
+				var fn;
+				eval('fn = ' + arg);
+				if (typeof fn === 'function') {
+					return fn;
+				}
+				return arg;
+			} catch (e) {
+				return arg;
+			}
+		}
 
-        if (typeof arg === 'object') {
-            mapObjectStringsToFunctions(arg);
-        }
-        return arg;
-    };
+		if (typeof arg === 'object') {
+			mapObjectStringsToFunctions(arg);
+		}
+		return arg;
+	};
 	for (var i = 0; i < args.length; i++) {
 		args[i] = mFn(args[i]);
 	}
@@ -371,7 +371,7 @@ fn.$_fn = function (parentReq, funcName) {
  * @constructor
  */
 function Request(name) {
-    /* jshint unused: false */
+	/* jshint unused: false */
 	this.init.apply(this, [].slice.call(arguments));
 }
 
@@ -397,8 +397,8 @@ Request.prototype = {
 
 		var id = + new Date();
 		while (id === + new Date()) {
-            // deliberately empty
-        }
+			// deliberately empty
+		}
 		id = + new Date();
 
 		this.id = id;
@@ -420,10 +420,10 @@ Request.prototype = {
 			// check if object is serializable
 			var jq = this.data;
 			var jq_array = jq instanceof $ ? jq.toArray() : jq;
-            // firefox happens to serialize Nodes somehow, check and throw if so
-            if (jq_array && jq_array.length && jq_array[0] instanceof Node) {
-                throw '';
-            }
+			// firefox happens to serialize Nodes somehow, check and throw if so
+			if (jq_array && jq_array.length && jq_array[0] instanceof Node) {
+				throw '';
+			}
 			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
 		} catch (e) {
 			this.targetWindow.postMessage(new UnserializableResponseData(this.id), this.targetOrigin);
@@ -492,11 +492,11 @@ Response.prototype = {
 			// check if object is serializable
 			var jq = this.data;
 			var jq_array = jq instanceof $ ? jq.toArray() : jq;
-            // firefox happens to serialize Nodes somehow, check and throw if so
-            if (jq_array && jq_array.length && jq_array[0] instanceof Node) {
-                throw '';
-            }
-            var serialized = JSON.stringify(this);
+			// firefox happens to serialize Nodes somehow, check and throw if so
+			if (jq_array && jq_array.length && jq_array[0] instanceof Node) {
+				throw '';
+			}
+			var serialized = JSON.stringify(this);
 			this.targetWindow.postMessage(serialized, this.targetOrigin);
 		} catch (e) {
 			this.data = new UnserializableResponseData(this.id);
