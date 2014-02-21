@@ -24,7 +24,8 @@ var please = function (targetWindow, targetOrigin) {
 		set: please.set,
 		get: please.get,
 		eval: please.eval,
-		$: please.$
+		$: please.$,
+		noConflict: please.noConflict
 	});
 };
 
@@ -78,7 +79,6 @@ var please_messageHandler = function (messageEvent) {
 	try {
 		data = JSON.parse(messageEvent.data);
 	} catch (e) {
-		console.log('error parsing json data');
 		return;
 	}
 
@@ -569,5 +569,11 @@ please.Error = function (error) {
 please.Request = Request;
 please.Response = Response;
 please.UnserializableResponseData = UnserializableResponseData;
+
+// returns please and removes the reference from window.
+please.noConfict = function () {
+	delete window.please;
+	return please;
+};
 
 })(jQuery, window);
