@@ -31,7 +31,6 @@ var please = function (targetWindow, targetOrigin) {
 };
 
 var requests = {}, responses = {};
-window.please = please;
 please.requests = requests;
 please.responses = responses;
 
@@ -578,5 +577,7 @@ please.noConfict = function () {
 	delete window.please;
 	return please;
 };
+
+window.please = please;
 
 })(jQuery, window);
