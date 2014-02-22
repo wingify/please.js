@@ -1,4 +1,5 @@
-(function ($, window) {
+var __pleaseClosure;
+(__pleaseClosure = function ($, window) {
 	'use strict';
 	var console = window.console;
 
