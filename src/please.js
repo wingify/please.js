@@ -52,6 +52,8 @@ please.defaults = function (values) {
  * @return {Object} A please object instance.
  */
 please.init = function (thisWindow) {
+	thisWindow = thisWindow || window;
+	thisWindow.removeEventListener('message', please_messageHandler);
 	thisWindow.addEventListener('message', please_messageHandler);
 	return please;
 };
