@@ -17,18 +17,15 @@ var defaults = {
  * @return {Object} A please object instance.
  */
 /* jshint evil: true */
-var please = function (targetWindow, targetOrigin) {
-	return $.extend(please.bind(), {
-		targetWindow: targetWindow,
-		targetOrigin: targetOrigin,
-		call: please.call,
-		set: please.set,
-		get: please.get,
-		eval: please.eval,
-		$: please.$,
-		noConflict: please.noConflict
-	});
+var please = function Please(targetWindow, targetOrigin) {
+	if (this instanceof Please) return;
+	var object = new Please;
+	object.targetWindow = targetWindow;
+	object.targetOrigin = targetOrigin;
+	return object;
 };
+
+please.prototype = please;
 
 var requests = {}, responses = {};
 please.requests = requests;
