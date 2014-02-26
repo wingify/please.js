@@ -606,9 +606,14 @@ please.Request = Request;
 please.Response = Response;
 please.UnserializableResponseData = UnserializableResponseData;
 
-// returns please and removes the reference from window.
-please.noConfict = function () {
-	delete window.please;
+// returns please and removes the reference from window or restores it.
+var oldPlease = window.please;
+please.noConflict = function () {
+	if (typeof oldPlease !== 'undefined') {
+		window.please = oldPlease;
+	} else {
+		delete window.please;
+	}
 	return please;
 };
 
