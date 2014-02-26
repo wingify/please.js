@@ -17,18 +17,15 @@ var defaults = {
  * @return {Object} A please object instance.
  */
 /* jshint evil: true */
-var please = function (targetWindow, targetOrigin) {
-	return $.extend(please.bind(), {
-		targetWindow: targetWindow,
-		targetOrigin: targetOrigin,
-		call: please.call,
-		set: please.set,
-		get: please.get,
-		eval: please.eval,
-		$: please.$,
-		noConflict: please.noConflict
-	});
+var please = function Please(targetWindow, targetOrigin) {
+	if (this instanceof Please) return;
+	var object = new Please;
+	object.targetWindow = targetWindow;
+	object.targetOrigin = targetOrigin;
+	return object;
 };
+
+please.prototype = please;
 
 var requests = {}, responses = {};
 please.requests = requests;
@@ -71,7 +68,7 @@ var please_request = function (requestName) {
 
 var please_messageHandler = function (messageEvent) {
 
-	if ($.isFunction(defaults.sourceOrigin)) {
+	if (typeof defaults.sourceOrigin === 'function') {
 		if (!defaults.sourceOrigin(messageEvent)) {
 			return;
 		}
@@ -605,6 +602,9 @@ please.Error = function (error) {
 please.Request = Request;
 please.Response = Response;
 please.UnserializableResponseData = UnserializableResponseData;
+
+// expose _please in the please namespace for the sole purpose of unit testing.
+please._please = _please;
 
 // returns please and removes the reference from window or restores it.
 var oldPlease = window.please;
