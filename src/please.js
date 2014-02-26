@@ -603,6 +603,9 @@ please.Request = Request;
 please.Response = Response;
 please.UnserializableResponseData = UnserializableResponseData;
 
+// expose _please in the please namespace for the sole purpose of unit testing.
+please._please = _please;
+
 // returns please and removes the reference from window or restores it.
 var oldPlease = window.please;
 please.noConflict = function () {
