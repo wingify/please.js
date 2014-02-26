@@ -68,7 +68,7 @@ var please_request = function (requestName) {
 
 var please_messageHandler = function (messageEvent) {
 
-	if ($.isFunction(defaults.sourceOrigin)) {
+	if (typeof defaults.sourceOrigin === 'function') {
 		if (!defaults.sourceOrigin(messageEvent)) {
 			return;
 		}
