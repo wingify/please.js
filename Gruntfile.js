@@ -21,6 +21,9 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint: {
+			options: {
+				jhintrc: true
+			},
 			all: ['Gruntfile.js', 'src/**/*.js', 'tests/unit/**/*.js']
 		},
 		qunit: {
