@@ -243,9 +243,21 @@ please(otherWindow).get('undef.blahBlah', function (propertyValue) { // success 
 
 ## Roadmap
 
-* Add support for communication in Chrome Extensions.
-* Add support for making please function accept a jQuery selector.
-* Document please.$ and improve its functionality.
+General changes on the list:
+
+1. Remove all instances of `$.extend` and add a custom implementation and use that instead.
+2. Add a polyfill for Object.keys.
+3. Use something else instead of $.globalEval.
+4. We can't really write our own Promise/A+ implementation, and unfortunately must depend on jQuery for that. But it would be good to have an API that is generic enough such that people can use this library with the Promise/A+ of their choice. The assumption would be that the custom implementation conforms to the Promise/A+ spec: http://promises-aplus.github.io/promises-spec/.
+(Basically removing the dependency on jQuery).
+
+Testing: The tests written so far are mostly functional / end-to-end tests with asynchronous behaviour. I've exposed `_please` under the `please` namespace so that each individual function can also be tested synchronously as a unit.
+
+Future Roadmap: These items are good to have to enhance the library.
+
+1. `please.$` is basically a mock jQuery object and does not really need the presence of jQuery in the calling window. It is like a test double that always returns a promise that resolves / rejects based on the return value of the corresponding function call. It would be good to have a generic enough API that can mock any object in the other frame in the calling frame, and use that API to mock jQuery.
+2. Add certain logic such that `please.js` need not be injected and initialized in both the frames. Only a couple of lines would be needed in the other frame to kickstart the communication.
+3. Add support for communication in Chrome Extensions.
 
 ## License
 
