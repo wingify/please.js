@@ -495,6 +495,10 @@ Request.create = function (obj) {
 	return $.extend(new Request(), obj);
 };
 
+function isPromise(allegedPromise) {
+	return allegedPromise && typeof allegedPromise.then === 'function';
+}
+
 Response.prototype = {
 	/**
 	 * Initializes a Response object instance.
@@ -518,22 +522,45 @@ Response.prototype = {
 	 * Sends the Response data to the requesting window.
 	 */
 	send: function () {
-		try {
-			this.targetWindow = this.targetWindow || defaults.targetWindow;
-			this.targetOrigin = this.targetOrigin || defaults.targetOrigin;
+		this.targetWindow = this.targetWindow || defaults.targetWindow;
+		this.targetOrigin = this.targetOrigin || defaults.targetOrigin;
 
-			// check if object is serializable
-			var jq = this.data;
+		// check if object is serializable
+		var jq = this.data;
+
+		var self = this;
+
+		try {
 			var jq_array = jq instanceof $ ? jq.toArray() : jq;
 			// firefox happens to serialize Nodes somehow, check and throw if so
 			if (jq_array && jq_array.length && jq_array[0] instanceof Node) {
 				throw '';
 			}
-			var serialized = JSON.stringify(this);
-			this.targetWindow.postMessage(serialized, this.targetOrigin);
+
+			var postSerializedResult = function() {
+				var serialized = JSON.stringify(self);
+				self.targetWindow.postMessage(serialized, self.targetOrigin);
+			};
+
+			if (isPromise(this.data)) {
+				this.data.then(
+						function(resolved) {
+							self.data = resolved;
+							self.success = true;
+							postSerializedResult();
+						},
+						function(error) {
+							self.data = new please.Error(error);
+							self.success = false;
+							postSerializedResult();
+						}
+				);
+			} else {
+				postSerializedResult();
+			}
 		} catch (e) {
 			this.data = new UnserializableResponseData(this.id);
-			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
+			postSerializedResult();
 		} finally {
 			if (!this.success) {
 				throw this.data.error;

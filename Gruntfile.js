@@ -28,13 +28,25 @@ module.exports = function(grunt) {
 		},
 		qunit: {
 			all: ['tests/index.html']
+		},
+
+		watch: {
+		dev: {
+			files: '<%= jshint.all %>',
+			tasks: ['qunit', 'jshint'],
+			options: {
+				spawn: false
+			}
 		}
+		},
 
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-qunit');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	grunt.registerTask('default', ['jshint', 'qunit', 'uglify']);
+	grunt.registerTask('dev', ['watch:dev']);
 };

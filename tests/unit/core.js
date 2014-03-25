@@ -332,6 +332,34 @@ asyncTest('Calling an erroneous function', function () {
 	});
 });
 
+asyncTest('Calling a function with resolved promise return', function () {
+	var childFrame = $('#child-frame').get(0);
+
+	runTestOnIframeLoad(function () {
+
+		please(childFrame.contentWindow).call('keepPromise').then(function (ret) {
+			equal(ret, 'fulfilled', 'Called function "keepPromise" in child returned value "fulfilled"');
+			start();
+		});
+
+	});
+});
+
+asyncTest('Calling a function with rejected promise return', function () {
+	var childFrame = $('#child-frame').get(0);
+
+	runTestOnIframeLoad(function () {
+
+		please(childFrame.contentWindow).call('letMeDown').then(function () {
+			ok(0, "No error occured.");
+		}, function (error) {
+			ok(error instanceof please.Error, "Error occured while resolving promise");
+			equal(error.error, 'sorry', 'Called function "letMeDown" in child returned value "sorry"');
+			start();
+		});
+
+	});
+});
 
 function runTestOnIframeLoad (cb) {
 	$('#child-frame').load(function () {

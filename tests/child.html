@@ -33,6 +33,22 @@
       return Array.prototype.slice.call(arguments);
     }
 
+    function keepPromise() {
+      var deferred = new $.Deferred();
+      setTimeout(function() {
+        deferred.resolve('fulfilled');
+      }, 1000);
+      return deferred.promise();
+    }
+
+    function letMeDown() {
+      var deferred = new $.Deferred();
+      setTimeout(function() {
+        deferred.reject('sorry');
+      }, 1000);
+      return deferred.promise();
+    }
+
     function teardownSourceOriginTest () {
       please.defaults({
         sourceOrigin: false
