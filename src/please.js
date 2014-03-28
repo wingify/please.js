@@ -55,6 +55,16 @@ please.init = function (thisWindow) {
 	return please;
 };
 
+/**
+ * Removes an event handlers registered by please.init.
+ * @param  {Window} thisWindow The reference to the window to remove event handlers from.
+ */
+please.destroy = function (thisWindow) {
+	thisWindow = thisWindow || window;
+	thisWindow.removeEventListener('message', please_messageHandler);
+	return please;
+};
+
 var please_request = function (requestName) {
 	return function () {
 		var req = new Request(requestName);
