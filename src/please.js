@@ -1,7 +1,6 @@
-var __pleaseClosure;
-(__pleaseClosure = function ($, window) {
+(function __pleaseClosure($, window) {
 	'use strict';
-	var console = window.console;
+	var console = window.console; // jshint unused: false
 
 var defaults = {
 	targetWindow: window,
@@ -18,8 +17,10 @@ var defaults = {
  */
 /* jshint evil: true */
 var please = function Please(targetWindow, targetOrigin) {
-	if (this instanceof Please) return;
-	var object = new Please;
+	if (this instanceof Please) {
+		return;
+	}
+	var object = new Please();
 	object.targetWindow = targetWindow;
 	object.targetOrigin = targetOrigin;
 	return object;
