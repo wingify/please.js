@@ -3,5 +3,5 @@
   "version": "0.1.8",
   "main": "./src/please.js",
   "keywords": ["util", "frame", "messaging"],
-  "ignore" : ["examples", "test", ".*", "*.md", "Gruntfile.js", "LICENSE-MIT", "package.json"]
+  "ignore" : ["examples", "tests", ".*", "*.md", "Gruntfile.js", "LICENSE-MIT", "package.json"]
 }
