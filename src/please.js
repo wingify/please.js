@@ -43,6 +43,10 @@ please.defaults = function (values) {
 	return please;
 };
 
+please.getDefaults = function() {
+	return defaults;
+};
+
 /**
  * Initialize please. In both the windows (frames), add the below code:
  *
