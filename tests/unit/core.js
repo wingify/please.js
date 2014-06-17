@@ -1,4 +1,4 @@
-/* global please, module, asyncTest, $, ok, start, equal, QUnit, deepEqual */
+/* global please, module, asyncTest, $, ok, start, equal, QUnit, deepEqual, test */
 (function(window) {
 	'use strict';
 
@@ -41,6 +41,20 @@
 			});
 
 		});
+	});
+
+	test('Getting defaults', function() {
+		var childFrame = $('#child-frame').get(0);
+
+		please.defaults({
+			targetWindow: childFrame.contentWindow
+		});
+
+		ok(childFrame.contentWindow === please.defaults().targetWindow, 'should return correct defaults');
+
+		// reset / teardown
+		var pleaseBySetter = please.defaults({targetWindow: window});
+		ok(please === pleaseBySetter, 'should return itself when being used as setter');
 	});
 
 	module('please.defaults.sourceOrigin');

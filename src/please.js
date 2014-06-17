@@ -39,6 +39,10 @@ please.responses = responses;
  * @return {Object} A please object instance.
  */
 please.defaults = function (values) {
+	if (arguments.length === 0) {
+		// getter
+		return defaults;
+	}
 	$.extend(true, defaults, values);
 	return please;
 };
