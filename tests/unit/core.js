@@ -50,10 +50,11 @@
 			targetWindow: childFrame.contentWindow
 		});
 
-		ok(childFrame.contentWindow === please.getDefaults().targetWindow, 'should return correct defaults');
+		ok(childFrame.contentWindow === please.defaults().targetWindow, 'should return correct defaults');
 
 		// reset / teardown
-		please.defaults({targetWindow: window});
+		var pleaseBySetter = please.defaults({targetWindow: window});
+		ok(please === pleaseBySetter, 'should return itself when being used as setter');
 	});
 
 	module('please.defaults.sourceOrigin');
