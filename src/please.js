@@ -82,7 +82,6 @@ var please_request = function (requestName) {
 };
 
 var please_messageHandler = function (messageEvent) {
-
 	if (typeof defaults.sourceOrigin === 'function') {
 		if (!defaults.sourceOrigin(messageEvent)) {
 			return;
@@ -434,6 +433,8 @@ function Response(req) {
 	this.init(req);
 }
 
+var lastRequestId = 0;
+
 Request.prototype = {
 	/**
 	 * Initializes a Request object instance.
@@ -443,13 +444,7 @@ Request.prototype = {
 	init: function (name) {
 		$.extend(this, $.Deferred());
 
-		var id = + new Date();
-		while (id === + new Date()) {
-			// deliberately empty
-		}
-		id = + new Date();
-
-		this.id = id;
+		this.id = lastRequestId++;
 		this.name = name;
 		this.data = [].slice.call(arguments);
 		this.type = 'request';
