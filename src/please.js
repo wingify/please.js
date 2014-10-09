@@ -1,12 +1,76 @@
-(function __pleaseClosure($, window) {
+(window.__pleaseClosure = function ($, window) {
 	'use strict';
 	var console = window.console; // jshint unused: false
 
 var defaults = {
 	targetWindow: window,
 	targetOrigin: '*',
-	sourceOrigin: false
+	sourceOrigin: false,
+	possiblyOverriddenNativeFunctions: []
 };
+
+var pristineWindow;
+var usePristineFunctionDefinitions = true;
+
+function isNativeFunction(fn) {
+	return String(fn).indexOf('[native code]') >= 0;
+}
+
+function getContextAndLastPathPart(context, path) {
+	var arr = path.split('.');
+	for (var i = 0, il = arr.length - 1; i < il; i++) {
+		context = context && context[arr[i]];
+		path = arr[i + 1];
+	}
+	return {
+		context: context,
+		lastPathPart: path
+	};
+}
+
+function overrideNativeFunctions(fns) {
+	if (!pristineWindow) { return; }
+	// not supported below ECMAScript 5.0
+	if (!Object.defineProperty) { return; }
+	return fns.map(function (funcPath) {
+		var actualObj = getContextAndLastPathPart(window, funcPath);
+		if (!actualObj.context) { return; }
+		var actualVal = actualObj.context[actualObj.lastPathPart];
+		if (isNativeFunction(actualVal)) { return; }
+		var pristineObj = getContextAndLastPathPart(pristineWindow, funcPath);
+		var pristineVal = pristineObj.context[pristineObj.lastPathPart];
+		Object.defineProperty(actualObj.context, actualObj.lastPathPart, {
+			configurable: true,
+			enumerable: false,
+			get: function () {
+				return usePristineFunctionDefinitions ? pristineVal : actualVal;
+			},
+			set: function (val) {
+				if (this === Object.prototype) {
+					actualVal = val;
+				} else {
+					Object.defineProperty(this, actualObj.lastPathPart, {
+						writable: true,
+						configurable: true,
+						enumerable: false,
+						value: val
+					});
+				}
+			}
+		});
+
+		return function restoreFunc() {
+			delete actualObj.context[actualObj.lastPathPart];
+			actualObj.context[actualObj.lastPathPart] = actualVal;
+		};
+	}).reduce(function (a, b) {
+		return function () {
+			return (a && a()) || (b && b());
+		};
+	}, null);
+}
+
+var restoreNativeFunctions;
 
 /**
  * The please global object. Can be used both as an object and a function.
@@ -54,9 +118,15 @@ please.defaults = function (values) {
  * @return {Object} A please object instance.
  */
 please.init = function (thisWindow) {
+	pristineWindow = $('<iframe>').appendTo('html').get(0).contentWindow;
+	restoreNativeFunctions = overrideNativeFunctions(defaults.possiblyOverriddenNativeFunctions);
+	usePristineFunctionDefinitions = true;
+	setTimeout(function () { usePristineFunctionDefinitions = false; }, 1);
+
 	thisWindow = thisWindow || window;
 	thisWindow.removeEventListener('message', please_messageHandler);
 	thisWindow.addEventListener('message', please_messageHandler);
+
 	return please;
 };
 
@@ -67,6 +137,9 @@ please.init = function (thisWindow) {
 please.destroy = function (thisWindow) {
 	thisWindow = thisWindow || window;
 	thisWindow.removeEventListener('message', please_messageHandler);
+	if (restoreNativeFunctions) {
+		restoreNativeFunctions();
+	}
 	return please;
 };
 
@@ -82,6 +155,10 @@ var please_request = function (requestName) {
 };
 
 var please_messageHandler = function (messageEvent) {
+	usePristineFunctionDefinitions = true;
+	// reset this in next stack
+	setTimeout(function () { usePristineFunctionDefinitions = false; }, 1);
+
 	if (typeof defaults.sourceOrigin === 'function') {
 		if (!defaults.sourceOrigin(messageEvent)) {
 			return;
@@ -263,7 +340,7 @@ _please.call = function (funcName) {
 		if (i === arr.length - 1) {
 			context = func;
 		}
-		func = func[item];
+		func = func && func[item];
 	});
 	if (typeof func === 'function') {
 		return func.apply(context, data);
@@ -449,13 +526,17 @@ Request.prototype = {
 		this.data = Array.prototype.slice.call(arguments);
 		this.type = 'request';
 
-		requests[id] = this;
+		requests[this.id] = this;
 	},
 
 	/**
 	 * Sends the request to the target window.
 	 */
 	send: function () {
+		usePristineFunctionDefinitions = true;
+		// reset this in next stack
+		setTimeout(function () { usePristineFunctionDefinitions = false; }, 1);
+
 		this.targetWindow = this.targetWindow || defaults.targetWindow;
 		this.targetOrigin = this.targetOrigin || defaults.targetOrigin;
 
@@ -532,6 +613,10 @@ Response.prototype = {
 	 * Sends the Response data to the requesting window.
 	 */
 	send: function () {
+		usePristineFunctionDefinitions = true;
+		// reset this in next stack
+		setTimeout(function () { usePristineFunctionDefinitions = false; }, 1);
+
 		this.targetWindow = this.targetWindow || defaults.targetWindow;
 		this.targetOrigin = this.targetOrigin || defaults.targetOrigin;
 
@@ -550,6 +635,8 @@ Response.prototype = {
 			var postSerializedResult = function() {
 				var serialized = JSON.stringify(self);
 				self.targetWindow.postMessage(serialized, self.targetOrigin);
+				// set this in next stack
+
 			};
 
 			if (isPromise(this.data)) {
