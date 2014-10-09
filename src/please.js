@@ -75,7 +75,7 @@ var please_request = function (requestName) {
 		var req = new Request(requestName);
 		req.targetWindow = this.targetWindow || defaults.targetWindow;
 		req.targetOrigin = this.targetOrigin || defaults.targetOrigin;
-		req.data = [].slice.call(arguments);
+		req.data = Array.prototype.slice.call(arguments);
 		req.send();
 		return req;
 	};
@@ -181,7 +181,7 @@ please.eval = please_request('eval');
  */
 please.$ = please_request('$');
 please.$ = function () {
-	var req = please_request('$').apply(this, [].slice.call(arguments));
+	var req = please_request('$').apply(this, Array.prototype.slice.call(arguments));
 	var jquery_fns = Object.keys($.fn);
 	var mapObjectFunctionsToStrings = function (obj) {
 		for (var i in obj) {
@@ -206,7 +206,7 @@ please.$ = function () {
 
 	var $_fn = function (funcName) {
 		return function () {
-			var args = [].slice.call(arguments);
+			var args = Array.prototype.slice.call(arguments);
 			args = mapArrayFunctionsToStrings(args);
 
 			var req = new Request('$_fn');
@@ -258,7 +258,7 @@ _please.call = function (funcName) {
 	var arr = funcName.split('.');
 	var context = window;
 	var func = context;
-	var data = [].slice.call(arguments, 1);
+	var data = Array.prototype.slice.call(arguments, 1);
 	arr.forEach(function (item, i) {
 		if (i === arr.length - 1) {
 			context = func;
@@ -358,7 +358,7 @@ _please.eval = function (statements) {
  * @return {jQuery} The jQuery object created using the selector passed.
  */
 _please.$ = function () {
-	return $.apply($, [].slice.call(arguments));
+	return $.apply($, Array.prototype.slice.call(arguments));
 };
 
 /**
@@ -377,7 +377,7 @@ _please.$_fn = function (parentReq, funcName) {
 		return null;
 	}
 
-	var args = [].slice.call(arguments, 2);
+	var args = Array.prototype.slice.call(arguments, 2);
 	var mFn = function (arg) {
 		if (typeof arg === 'string') {
 			try {
@@ -419,7 +419,7 @@ _please.$_fn = function (parentReq, funcName) {
  */
 function Request(name) {
 	/* jshint unused: false */
-	this.init.apply(this, [].slice.call(arguments));
+	this.init.apply(this, Array.prototype.slice.call(arguments));
 }
 
 /**
@@ -446,7 +446,7 @@ Request.prototype = {
 
 		this.id = lastRequestId++;
 		this.name = name;
-		this.data = [].slice.call(arguments);
+		this.data = Array.prototype.slice.call(arguments);
 		this.type = 'request';
 
 		requests[id] = this;
