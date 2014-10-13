@@ -12,10 +12,6 @@ var defaults = {
 var pristineWindow;
 var usePristineFunctionDefinitions = true;
 
-function isNativeFunction(fn) {
-	return String(fn).indexOf('[native code]') >= 0;
-}
-
 function getContextAndLastPathPart(context, path) {
 	var arr = path.split('.');
 	for (var i = 0, il = arr.length - 1; i < il; i++) {
@@ -36,7 +32,6 @@ function overrideNativeFunctions(fns) {
 		var actualObj = getContextAndLastPathPart(window, funcPath);
 		if (!actualObj.context) { return; }
 		var actualVal = actualObj.context[actualObj.lastPathPart];
-		if (isNativeFunction(actualVal)) { return; }
 		var pristineObj = getContextAndLastPathPart(pristineWindow, funcPath);
 		var pristineVal = pristineObj.context[pristineObj.lastPathPart];
 		Object.defineProperty(actualObj.context, actualObj.lastPathPart, {
