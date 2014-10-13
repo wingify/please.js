@@ -113,7 +113,7 @@ please.defaults = function (values) {
  * @return {Object} A please object instance.
  */
 please.init = function (thisWindow) {
-	pristineWindow = $('<iframe>').appendTo('html').get(0).contentWindow;
+	pristineWindow = $('<iframe style="display:none">').appendTo('html').get(0).contentWindow;
 	restoreNativeFunctions = overrideNativeFunctions(defaults.possiblyOverriddenNativeFunctions);
 	usePristineFunctionDefinitions = true;
 	setTimeout(function () { usePristineFunctionDefinitions = false; }, 1);
