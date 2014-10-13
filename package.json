@@ -2,7 +2,7 @@
   "name": "please",
   "title": "please.js",
   "description": "A simple PostMessage communication library",
-  "version": "0.1.0",
+  "version": "0.1.10",
   "homepage": "",
   "author": "Wingify",
   "repository": {
