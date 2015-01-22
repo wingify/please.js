@@ -34,25 +34,27 @@ function overrideNativeFunctions(fns) {
 		var actualVal = actualObj.context[actualObj.lastPathPart];
 		var pristineObj = getContextAndLastPathPart(pristineWindow, funcPath);
 		var pristineVal = pristineObj.context[pristineObj.lastPathPart];
-		Object.defineProperty(actualObj.context, actualObj.lastPathPart, {
-			configurable: true,
-			enumerable: false,
-			get: function () {
-				return usePristineFunctionDefinitions ? pristineVal : actualVal;
-			},
-			set: function (val) {
-				if (this === Object.prototype) {
-					actualVal = val;
-				} else {
-					Object.defineProperty(this, actualObj.lastPathPart, {
-						writable: true,
-						configurable: true,
-						enumerable: false,
-						value: val
-					});
+		try {
+			Object.defineProperty(actualObj.context, actualObj.lastPathPart, {
+				configurable: true,
+				enumerable: false,
+				get: function () {
+					return usePristineFunctionDefinitions ? pristineVal : actualVal;
+				},
+				set: function (val) {
+					if (this === Object.prototype) {
+						actualVal = val;
+					} else {
+						Object.defineProperty(this, actualObj.lastPathPart, {
+							writable: true,
+							configurable: true,
+							enumerable: false,
+							value: val
+						});
+					}
 				}
-			}
-		});
+			});
+		} catch (e) {}
 
 		return function restoreFunc() {
 			delete actualObj.context[actualObj.lastPathPart];
