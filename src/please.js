@@ -69,6 +69,10 @@ function overrideNativeFunctions(fns) {
 
 var restoreNativeFunctions;
 
+function isNode(node) {
+	return node.hasOwnProperty('nodeName') && node.hasOwnProperty('nodeType');
+}
+
 /**
  * The please global object. Can be used both as an object and a function.
  *
@@ -542,7 +546,7 @@ Request.prototype = {
 			var jq = this.data;
 			var jq_array = jq instanceof $ ? jq.toArray() : jq;
 			// firefox happens to serialize Nodes somehow, check and throw if so
-			if (jq_array && jq_array.length && jq_array[0] instanceof Node) {
+			if (jq_array && jq_array.length && isNode(jq_array[0])) {
 				throw '';
 			}
 			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
@@ -625,7 +629,7 @@ Response.prototype = {
 		try {
 			var jq_array = jq instanceof $ ? jq.toArray() : jq;
 			// firefox happens to serialize Nodes somehow, check and throw if so
-			if (jq_array && jq_array.length && jq_array[0] instanceof Node) {
+			if (jq_array && jq_array.length && isNode(jq_array[0])) {
 				throw '';
 			}
 
