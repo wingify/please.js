@@ -470,9 +470,10 @@ _please.$_fn = function (parentReq, funcName) {
 			}
 		}
 
-		if (typeof arg === 'object') {
-			mapObjectStringsToFunctions(arg);
-		}
+                //// this function is undefined todo?!?
+//		if (typeof arg === 'object') {
+//			mapObjectStringsToFunctions(arg);
+//		}
 		return arg;
 	};
 	for (var i = 0; i < args.length; i++) {
@@ -626,19 +627,18 @@ Response.prototype = {
 
 		var self = this;
 
-		try {
+                var postSerializedResult = function() {
+                        var serialized = JSON.stringify(self);
+                        self.targetWindow.postMessage(serialized, self.targetOrigin);
+                        // set this in next stack
+                };
+
+                try {
 			var jq_array = jq instanceof $ ? jq.toArray() : jq;
 			// firefox happens to serialize Nodes somehow, check and throw if so
 			if (jq_array && jq_array.length && isNode(jq_array[0])) {
 				throw '';
 			}
-
-			var postSerializedResult = function() {
-				var serialized = JSON.stringify(self);
-				self.targetWindow.postMessage(serialized, self.targetOrigin);
-				// set this in next stack
-
-			};
 
 			if (isPromise(this.data)) {
 				this.data.then(
