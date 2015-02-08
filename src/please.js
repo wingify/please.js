@@ -633,7 +633,7 @@ Response.prototype = {
                         // set this in next stack
                 };
 
-                try {
+		try {
 			var jq_array = jq instanceof $ ? jq.toArray() : jq;
 			// firefox happens to serialize Nodes somehow, check and throw if so
 			if (jq_array && jq_array.length && isNode(jq_array[0])) {
