@@ -648,6 +648,7 @@ Response.prototype = {
 							postSerializedResult();
 						},
 						function(error) {
+							error = error || new Error('Promise rejected without given error');
 							self.data = new please.Error(error);
 							self.success = false;
 							postSerializedResult();
