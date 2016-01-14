@@ -12,12 +12,7 @@
   "bugs": {
     "url": "https://github.com/Wingify/pleasejs/issues"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://opensource.org/licenses/MIT"
-    }
-  ],
+  "license":"MIT",
   "keywords": [],
   "devDependencies": {
     "grunt": "~0.4.4",
