@@ -4,6 +4,7 @@
   "description": "A simple PostMessage communication library",
   "version": "0.1.10",
   "homepage": "",
+  "main": "./src/please.js",
   "author": "Wingify",
   "repository": {
     "type": "git",
