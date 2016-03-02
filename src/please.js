@@ -551,7 +551,10 @@ Request.prototype = {
 			}
 			this.targetWindow.postMessage(JSON.stringify(this), this.targetOrigin);
 		} catch (e) {
-			this.targetWindow.postMessage(new UnserializableResponseData(this.id), this.targetOrigin);
+			// Catch error if any to avoid breaking the code send function is being used in.
+			try {
+				this.targetWindow.postMessage(new UnserializableResponseData(this.id), this.targetOrigin);
+			} catch(e) {}
 		}
 	},
 	/**
