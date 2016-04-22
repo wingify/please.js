@@ -1,4 +1,4 @@
-# please.js 
+# please.js
 
 please.js is a Request/Response based wrapper around the PostMessage API that makes use of jQuery Promises. Ever faced trouble communicating between two frames on different domains? Trouble not, just say please!
 
@@ -66,7 +66,7 @@ Before initialization however, you must make sure that both the current window a
 please.defaults({
     // reference to the window to send messages to
     targetWindow: otherWindow,
-    
+
     // what the target window's origin must be for the communication to facilitate
     targetOrigin: otherWindowOrigin,
 
@@ -106,7 +106,7 @@ Sets the default `targetWindow` to send message to, the `targetOrigin` of that w
 please.defaults({
     // reference to the window to send messages to
     targetWindow: $('iframe').get(0).contentWindow,
-    
+
     // what the target window's origin must be for the communication to facilitate
     targetOrigin: '*.example.com',
 
@@ -263,4 +263,4 @@ Future Roadmap: These items are good to have to enhance the library.
 
 The MIT License
 
-Copyright (c) 2013 Wingify Software Pvt. Ltd.
+Copyright (c) 2013-2016 Wingify Software Pvt. Ltd.
