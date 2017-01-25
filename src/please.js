@@ -522,12 +522,14 @@ Request.prototype = {
 	init: function (name) {
 		$.extend(this, $.Deferred());
 
-		this.id = lastRequestId++;
-		this.name = name;
-		this.data = Array.prototype.slice.call(arguments);
 		this.type = 'request';
 
-		requests[this.id] = this;
+        if (name !== null) {
+            this.id = lastRequestId++;
+            this.name = name;
+            this.data = Array.prototype.slice.call(arguments);
+            requests[this.id] = this;
+        }
 	},
 
 	/**
