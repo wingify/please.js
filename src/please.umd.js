@@ -1,5 +1,12 @@
-(window.__pleaseClosure = function (self) {
-	'use strict';
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['q'], factory);
+    } else if (typeof module === 'object' && module.exports) {
+        module.exports = factory(require('q'));
+    } else {
+        root.__pleaseClosure = factory(root.Q);
+    }
+})(self, function (q) {
     var console = self.console; // jshint unused: false
 
     var defaults = {
@@ -12,112 +19,27 @@
     var pristineWindow;
     var usePristineFunctionDefinitions = true;
 
-    var q = self.Q;
+    var deepExtend = function(out) {
+        out = out || {};
 
-    var class2type = {};
-    var toString = class2type.toString;
-    var hasOwn = class2type.hasOwnProperty;
-    var fnToString = hasOwn.toString;
-    var ObjectFunctionString = fnToString.call(Object);
-    var getProto = Object.getPrototypeOf;
+        for (var i = 1; i < arguments.length; i++) {
+            var obj = arguments[i];
 
-    function globalEval(code) {
-    	var doc = document;
-        var script = doc.createElement('script');
+            if (!obj)
+                continue;
 
-        script.text = code;
-        doc.head.appendChild(script).parentNode.removeChild(script);
-	}
-
-	function isPlainObject(obj) {
-        var proto, Ctor;
-
-        // Detect obvious negatives
-        // Use toString instead of jQuery.type to catch host objects
-        if ( !obj || toString.call( obj ) !== "[object Object]" ) {
-            return false;
-        }
-
-        proto = getProto( obj );
-
-        // Objects with no prototype (e.g., `Object.create( null )`) are plain
-        if ( !proto ) {
-            return true;
-        }
-
-        // Objects with prototype are plain iff they were constructed by a global Object function
-        Ctor = hasOwn.call( proto, "constructor" ) && proto.constructor;
-        return typeof Ctor === "function" && fnToString.call( Ctor ) === ObjectFunctionString;
-    }
-
-    function extend() {
-        var options, name, src, copy, copyIsArray, clone,
-            target = arguments[ 0 ] || {},
-            i = 1,
-            length = arguments.length,
-            deep = false;
-
-        // Handle a deep copy situation
-        if ( typeof target === "boolean" ) {
-            deep = target;
-
-            // Skip the boolean and the target
-            target = arguments[ i ] || {};
-            i++;
-        }
-
-        // Handle case when target is a string or something (possible in deep copy)
-        if ( typeof target !== 'object' && typeof target !== 'function') {
-            target = {};
-        }
-
-        // Extend jQuery itself if only one argument is passed
-        if ( i === length ) {
-            target = this;
-            i--;
-        }
-
-        for ( ; i < length; i++ ) {
-
-            // Only deal with non-null/undefined values
-            if ( ( options = arguments[ i ] ) != null ) {
-
-                // Extend the base object
-                for ( name in options ) {
-                    src = target[ name ];
-                    copy = options[ name ];
-
-                    // Prevent never-ending loop
-                    if ( target === copy ) {
-                        continue;
-                    }
-
-                    // Recurse if we're merging plain objects or arrays
-                    if ( deep && copy && ( isPlainObject( copy ) ||
-                            ( copyIsArray = Array.isArray( copy ) ) ) ) {
-
-                        if ( copyIsArray ) {
-                            copyIsArray = false;
-                            clone = src && Array.isArray( src ) ? src : [];
-
-                        } else {
-                            clone = src && isPlainObject( src ) ? src : {};
-                        }
-
-                        // Never move original objects, clone them
-                        target[ name ] = extend( deep, clone, copy );
-
-                        // Don't bring in undefined values
-                    } else if ( copy !== undefined ) {
-                        target[ name ] = copy;
-                    }
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    if (typeof obj[key] === 'object')
+                        out[key] = deepExtend(out[key], obj[key]);
+                    else
+                        out[key] = obj[key];
                 }
             }
         }
 
-        // Return the modified object
-        return target;
-	}
+        return out;
+    };
 
     function getContextAndLastPathPart(context, path) {
         var arr = path.split('.');
@@ -215,7 +137,7 @@
             // getter
             return defaults;
         }
-        extend(defaults, values);
+        $.extend(defaults, values);
         return please;
     };
 
@@ -388,7 +310,7 @@
                 }
                 if (typeof arg === 'object') {
                     // $.extend(true, {}, arg);
-                    extend({}, arg);
+                    deepExtend({}, arg);
                     mapObjectFunctionsToStrings(arg);
                 }
                 return arg;
@@ -538,7 +460,7 @@
      * @param  {String} statements The statements to eval in the target frame.
      */
     _please.eval = function (statements) {
-        return globalEval(statements);
+        return $.globalEval(statements);
     };
 
     /**
@@ -630,7 +552,8 @@
          * @param  {String} name The name of the request.
          */
         init: function (name) {
-            extend(this, q.defer());
+            $.extend(this, q.defer());
+            // deepExtend(this, Q.defer());
 
             this.id = lastRequestId++;
             this.name = name;
@@ -694,7 +617,7 @@
      * @return {Request} A Request object instance.
      */
     Request.create = function (obj) {
-        return extend(new Request(), obj);
+        return deepExtend(new Request(), obj);
     };
 
     function isPromise(allegedPromise) {
@@ -736,18 +659,19 @@
 
             var self = this;
 
-            var postSerializedResult = function() {
-                var serialized = JSON.stringify(self);
-                self.targetWindow.postMessage(serialized, self.targetOrigin);
-                // set this in next stack
-            };
-
             try {
                 var jq_array = jq;
                 // firefox happens to serialize Nodes somehow, check and throw if so
                 if (jq_array && jq_array.length && isNode(jq_array[0])) {
                     throw '';
                 }
+
+                var postSerializedResult = function() {
+                    var serialized = JSON.stringify(self);
+                    self.targetWindow.postMessage(serialized, self.targetOrigin);
+                    // set this in next stack
+
+                };
 
                 if (isPromise(this.data)) {
                     this.data.then(
@@ -812,12 +736,12 @@
      * @return {Request} A Unserializable object instance.
      */
     UnserializableResponseData.create = function (obj) {
-        return extend(new UnserializableResponseData(), obj);
+        return deepExtend(new UnserializableResponseData(), obj);
     };
 
     please.Error = function (error) {
         this.error = error;
-        extend(this, error);
+        deepExtend(this, error);
         this.name = error.name;
         this.message = error.message;
 
@@ -853,5 +777,4 @@
     };
 
     self.please = please;
-
-})(window);
+});

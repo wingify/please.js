@@ -277,7 +277,7 @@
 		runTestOnIframeLoad(function () {
 
 			please(childFrame.contentWindow).call('echoFunction', undefined).then(function (echo) {
-				deepEqual(echo, [null], 'Called function echoFunction with undefined param should return a null param');
+				deepEqual(echo, [{}], 'Called function echoFunction with undefined param should return a null param');
 				start();
 			});
 		});
